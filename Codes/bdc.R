@@ -7,7 +7,7 @@ library(tidyverse)
 metadata <-
   read.csv('mirid_metadata.csv')
 
-#### Path to the folder containing the example datasets. For instance: ####
+#### Path to the folder containing the example datasets. Can ignore ####
 path <- "C:/Users/kendr/OneDrive - National University of Singapore/NUS Documents/FYP/R codes"
 
 # Change in the Configuration table the path to the folder in your computer containing the example datasets
@@ -23,6 +23,8 @@ database <-
                            format = "csv",
                            overwrite = TRUE,
                            save_database = TRUE)
+
+#30435 records
 
 #Flag missing scientific names
 check_pf <-
@@ -108,7 +110,7 @@ report <-
   bdc_create_report(data = check_pf,
                     database_id = "database_id",
                     workflow_step = "prefilter",
-                    save_report = FALSE)
+                    save_report = TRUE)
 
 report
 
@@ -117,7 +119,7 @@ figures <-
   bdc_create_figures(data = check_pf,
                      database_id = "database_id",
                      workflow_step = "prefilter",
-                     save_figures = FALSE) #not working but dont know why
+                     save_figures = FALSE)
 
 # Check figures using
 figures$.coordinates_empty
@@ -127,7 +129,7 @@ figures$.coordinates_empty
 
 # Clean and parse species names
 db <- 
-  read.csv('00_merged_database.csv')
+  read.csv(here::here("Output/Intermediate/00_merged_database.csv"))
 
 parse_names <-
   bdc_clean_names(sci_names = db$scientificName, save_outputs = FALSE) #doesn't standardise/capitalise names?
@@ -164,9 +166,9 @@ report <-
   bdc_create_report(data = db,
                     database_id = "database_id",
                     workflow_step = "taxonomy",
-                    save_report = FALSE)
+                    save_report = TRUE)
 
-report #accepted names: 12438; 2025 records unaccepted or uninterpretable names
+report #accepted names: 21580; 6009 records unaccepted or uninterpretable names or uncertain
 
 unresolved_names <- 
   bdc_filter_out_names(data = db,
@@ -188,7 +190,7 @@ db1 <-
 
 # First clean db1 to remove records with NA in coordinate columns
 db1 <- db1 %>% 
-  filter(!is.na(decimalLatitude)) #11746 non-NA coordinates
+  filter(!is.na(decimalLatitude) | !is.na(decimalLongitude)) #17452 non-NA coordinates
 
 #Identify records with off-coordinate precision
 check_space <-
@@ -239,7 +241,7 @@ check_space <-
     urban_ref = NULL,
     value = "spatialvalid" # result of tests are appended in separate columns
   )
-#flagged 9342/11746 records
+#flagged 14147/17452 records
 
 check_space <- bdc_summary_col(data = check_space)
 
@@ -258,15 +260,15 @@ report <-
   bdc_create_report(data = check_space,
                     database_id = "database_id",
                     workflow_step = "space",
-                    save_report = FALSE)
+                    save_report = TRUE)
 
-report #8995 duplicated coordinates per species -- biggest problem
+report #13845 duplicated coordinates per species -- biggest problem
 
 figures <-
   bdc_create_figures(data = check_space,
                      database_id = "database_id",
                      workflow_step = "space",
-                     save_figures = FALSE) #also not working
+                     save_figures = FALSE) # not working
 
 # Check figures using
 figures$.rou
@@ -281,22 +283,21 @@ check_space %>%
 
 #Read database
 db2 <-
-  readr::read_csv(here::here("Output/Intermediate/03_space_database.csv")) #11746 records
+  readr::read_csv(here::here("Output/Intermediate/03_space_database.csv")) #17452 records
 
 #Flag records without event date information
 check_time <-
-  bdc_eventDate_empty(data = database, eventDate = "verbatimEventDate") #5019 records
+  bdc_eventDate_empty(data = database, eventDate = "verbatimEventDate") #flagged 16742 records
 
 #Extract 4-digit years from event date
 check_time <-
-  bdc_year_from_eventDate(data = check_time, eventDate = "verbatimEventDate") #9706 records
+  bdc_year_from_eventDate(data = check_time, eventDate = "verbatimEventDate")
 
 #Flag records with out-of-range event date, default = 1900
 check_time <-
   bdc_year_outOfRange(data = check_time,
                       eventDate = "year",
-                      year_threshold = 1900) #86 records
-
+                      year_threshold = 1900)
 #Generate report
 check_time <- bdc_summary_col(data = check_time)
 
@@ -304,9 +305,9 @@ report <-
   bdc_create_report(data = check_time,
                     database_id = "database_id",
                     workflow_step = "time",
-                    save_report = FALSE)
+                    save_report = TRUE)
 
-report #5105 records flagged
+report #16771 records flagged
 
 #Figure
 figures <-
@@ -329,7 +330,7 @@ check_time %>%
 output <-
   check_time %>%
   dplyr::filter(.summary == TRUE) %>%
-  bdc_filter_out_flags(data = ., col_to_remove = "all") #9742 records remaining
+  bdc_filter_out_flags(data = ., col_to_remove = "all") #13664 records remaining
 
 #Saving 'cleaned' output as csv database
 output %>%
@@ -341,7 +342,7 @@ db3 <- readr::read_csv(here::here("Output/Intermediate/05_cleaned_database.csv")
 
 db3 %>%
   count(scientificName == 'Miridae'|scientificName == 'Heteroptera'|scientificName == 'miridae')
-# 3891 'Miridae' or 'Heteroptera' or 'miridae' records; 1204 NA records
+# 8336 'Miridae' or 'Heteroptera' or 'miridae' records; 1204 NA records
 
 #Remove 'Miridae', 'Heteroptera' and NA records
 db3 <- db3 %>%
@@ -350,7 +351,7 @@ db3 <- db3 %>%
            !scientificName == 'miridae' &
            !is.na(scientificName))
 
-#4648 records remaining
+#4124 records remaining
 
 #Save output
 db3 %>%
