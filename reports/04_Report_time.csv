@@ -1,7 +1,0 @@
-Description,Test_name,Records_flagged,perc_number_records(*)
-Records with empty eventDate,.eventDate_empty,5019,33.8
-"Records with year out-of-range (i.e., year in the future or
-                collected before a threshold defined by the user).",.year_outOfRange,86,0.58
-Summary of all tests,.summary,5105,34.38
-,,,
-"(*) calculated in relation to total number of records, i.e. 14847 records",,,
