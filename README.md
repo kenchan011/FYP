@@ -1,6 +1,7 @@
 # FYP
 
 Results from cleaning raw data from GBIF and iDigBio using bdc package
+
 Steps followed protocol here: https://brunobrr.github.io/bdc/index.html
 
 bdc uses Taxadb and CoordinateCleaner to clean taxonomic and geographic data respectively. For taxadb, GBIF database v22.12 was used
