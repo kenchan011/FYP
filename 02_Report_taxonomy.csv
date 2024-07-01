@@ -1,0 +1,14 @@
+Description,notes,number_of_records,perc_number_records(*)
+valid: name accepted,accepted,21580,70.91
+valid: synonym replaced by an accepted name,accepted | replaceSynonym,2850,9.36
+valid: accepted name that was misspelled,accepted | wasMisspelled,33,0.11
+valid: accepted name assigned as misspelled synonym,accepted | wasMisspelled | replaceSynonym,7,0.02
+check: ambiguous synonym linked to multiple accepted names,heterotypic synonym,7,0.02
+check: ambiguous synonym linked to multiple accepted names,homotypic synonym,2,0.01
+invalid: name linked to multiple accepted names,multipleAccepted,13,0.04
+"invalid: name not found in the taxonomic database or a non
+                -interpretable name",notFound,3654,12.01
+invalid: no interpretable name,,2289,7.52
+check: doubtful taxonomic identification,taxo_uncer,66,0.22
+,,,
+"(*) calculated in relation to total number of records, i.e. 30435 records",,,
